@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 
@@ -12,6 +12,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class App implements OnInit {
   private readonly http = inject(HttpClient);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly apiBase = '/api';
 
   posts: PostSummary[] = [];
@@ -55,6 +56,7 @@ export class App implements OnInit {
       this.error = err instanceof Error ? err.message : 'Failed to load posts';
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -71,6 +73,8 @@ export class App implements OnInit {
       this.tagsInput = post.tags.join(', ');
     } catch (err) {
       this.error = err instanceof Error ? err.message : 'Failed to load post';
+    } finally {
+      this.cdr.detectChanges();
     }
   }
 
@@ -123,6 +127,7 @@ export class App implements OnInit {
       this.error = err instanceof Error ? err.message : 'Save failed';
     } finally {
       this.saving = false;
+      this.cdr.detectChanges();
     }
   }
 }
