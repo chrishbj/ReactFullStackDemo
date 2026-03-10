@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, NgZone, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { finalize, take } from 'rxjs';
 
@@ -12,6 +12,7 @@ import { finalize, take } from 'rxjs';
 })
 export class App implements OnInit {
   private readonly http = inject(HttpClient);
+  private readonly zone = inject(NgZone);
   private readonly apiBase = '/api';
 
   posts: PostSummary[] = [];
@@ -56,11 +57,15 @@ export class App implements OnInit {
       )
       .subscribe({
         next: (data) => {
-          this.posts = data;
+          this.zone.run(() => {
+            this.posts = data;
+          });
         },
         error: (err) => {
-          this.error =
-            err instanceof Error ? err.message : 'Failed to load posts';
+          this.zone.run(() => {
+            this.error =
+              err instanceof Error ? err.message : 'Failed to load posts';
+          });
         }
       });
   }
@@ -73,14 +78,18 @@ export class App implements OnInit {
       .pipe(take(1))
       .subscribe({
         next: (post) => {
-          this.title = post.title;
-          this.markdown = post.markdown;
-          this.status = post.status;
-          this.tagsInput = post.tags.join(', ');
+          this.zone.run(() => {
+            this.title = post.title;
+            this.markdown = post.markdown;
+            this.status = post.status;
+            this.tagsInput = post.tags.join(', ');
+          });
         },
         error: (err) => {
-          this.error =
-            err instanceof Error ? err.message : 'Failed to load post';
+          this.zone.run(() => {
+            this.error =
+              err instanceof Error ? err.message : 'Failed to load post';
+          });
         }
       });
   }
@@ -120,12 +129,16 @@ export class App implements OnInit {
           )
           .subscribe({
             next: (created) => {
-              this.selectedId = created.id;
-              this.loadPosts();
+              this.zone.run(() => {
+                this.selectedId = created.id;
+                this.loadPosts();
+              });
             },
             error: (err) => {
-              this.error =
-                err instanceof Error ? err.message : 'Save failed';
+              this.zone.run(() => {
+                this.error =
+                  err instanceof Error ? err.message : 'Save failed';
+              });
             }
           });
         return;
@@ -147,10 +160,15 @@ export class App implements OnInit {
         )
         .subscribe({
           next: () => {
-            this.loadPosts();
+            this.zone.run(() => {
+              this.loadPosts();
+            });
           },
           error: (err) => {
-            this.error = err instanceof Error ? err.message : 'Save failed';
+            this.zone.run(() => {
+              this.error =
+                err instanceof Error ? err.message : 'Save failed';
+            });
           }
         });
       return;
