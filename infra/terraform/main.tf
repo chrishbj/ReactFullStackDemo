@@ -191,8 +191,13 @@ resource "azurerm_container_app" "angular" {
       memory = "0.5Gi"
 
       env {
-        name  = "API_UPSTREAM"
-        value = "https://${azurerm_container_app.app.ingress[0].fqdn}"
+        name  = "API_UPSTREAM_SCHEME"
+        value = "https"
+      }
+
+      env {
+        name  = "API_UPSTREAM_HOST"
+        value = azurerm_container_app.app.ingress[0].fqdn
       }
     }
   }
