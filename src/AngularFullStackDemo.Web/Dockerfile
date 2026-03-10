@@ -7,5 +7,5 @@ RUN npm run build
 
 FROM nginx:1.27-alpine
 COPY src/AngularFullStackDemo.Web/nginx.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=build /app/dist/AngularFullStackDemo.Web /usr/share/nginx/html
+COPY --from=build /app/dist/AngularFullStackDemo.Web/browser /usr/share/nginx/html
 EXPOSE 80
