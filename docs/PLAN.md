@@ -25,6 +25,9 @@
   - `angular-web`: Nginx container serving Angular and proxying `/api` to `api`.
   - `api`: ASP.NET Core API connecting to `mongo`.
   - `mongo`: MongoDB container with a named volume.
+- Local Docker Compose (Angular reuse backend):
+  - `angular-web` proxies `/api` to `host.docker.internal:5069`.
+  - Uses the React stack API container without creating new `api`/`mongo`.
 - Azure Container Apps:
   - One Container App with two containers: `web` and `api`.
   - `mongo` as a sidecar for demo use (EmptyDir, non-persistent).
