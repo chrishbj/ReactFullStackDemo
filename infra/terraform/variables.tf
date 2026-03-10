@@ -34,6 +34,18 @@ variable "web_image_tag" {
   default     = "v1"
 }
 
+variable "angular_image_name" {
+  type        = string
+  description = "Container image name for the Angular web app."
+  default     = "react-fullstack-demo-angular"
+}
+
+variable "angular_image_tag" {
+  type        = string
+  description = "Container image tag for the Angular web app."
+  default     = "v1"
+}
+
 variable "mongo_database" {
   type        = string
   description = "MongoDB database name."

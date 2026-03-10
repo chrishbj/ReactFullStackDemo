@@ -121,6 +121,7 @@ terraform apply -var="api_image_tag=v1" -var="web_image_tag=v1"
 6. Get the URL
 ```bash
 terraform output container_app_url
+terraform output angular_app_url
 ```
 
 ## Architecture Diagrams

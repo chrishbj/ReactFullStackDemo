@@ -152,3 +152,48 @@ resource "azurerm_container_app" "app" {
     }
   }
 }
+
+resource "azurerm_container_app" "angular" {
+  name                         = "${var.name_prefix}-angular"
+  resource_group_name          = azurerm_resource_group.rg.name
+  container_app_environment_id = azurerm_container_app_environment.env.id
+  revision_mode                = "Single"
+
+  ingress {
+    external_enabled = true
+    target_port      = 80
+
+    traffic_weight {
+      latest_revision = true
+      percentage      = 100
+    }
+  }
+
+  secret {
+    name  = "acr-password"
+    value = azurerm_container_registry.acr.admin_password
+  }
+
+  registry {
+    server               = azurerm_container_registry.acr.login_server
+    username             = azurerm_container_registry.acr.admin_username
+    password_secret_name = "acr-password"
+  }
+
+  template {
+    min_replicas = 1
+    max_replicas = 1
+
+    container {
+      name   = "angular-web"
+      image  = "${azurerm_container_registry.acr.login_server}/${var.angular_image_name}:${var.angular_image_tag}"
+      cpu    = 0.25
+      memory = "0.5Gi"
+
+      env {
+        name  = "API_UPSTREAM"
+        value = "${azurerm_container_app.app.latest_revision_fqdn}:8080"
+      }
+    }
+  }
+}
