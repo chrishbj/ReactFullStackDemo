@@ -1,8 +1,10 @@
 name: deploy-azure-dispatch
 
 on:
-  push:
+  workflow_run:
+    workflows: ["ci"]
     branches: [main]
+    types: [completed]
   workflow_dispatch:
 
 env:
@@ -11,6 +13,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: read
       id-token: write
