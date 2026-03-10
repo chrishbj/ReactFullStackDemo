@@ -2,6 +2,7 @@
 bin/
 obj/
 dist/
+src/AngularFullStackDemo.Web/dist/
 
 ## User-specific files
 *.user
@@ -24,6 +25,7 @@ Thumbs.db
 .env
 appsettings.Development.json
 src/ReactFullStackDemo.Web/node_modules/
+src/AngularFullStackDemo.Web/node_modules/
 
 ## Terraform / infra artifacts
 infra/terraform/.terraform/

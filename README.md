@@ -34,6 +34,16 @@ npm run dev
 
 Vite dev server: `http://localhost:5173`
 
+## Angular Frontend (Local Dev)
+
+```bash
+cd src/AngularFullStackDemo.Web
+npm install
+npm start
+```
+
+Angular dev server: `http://localhost:4200`
+
 ## Frontend (Docker)
 
 ```bash
@@ -52,6 +62,23 @@ docker compose -f infra/docker-compose.full.yml up -d --build
 
 Web + API via Nginx: `http://localhost:8080`
 Health: `http://localhost:8080/api/health`
+
+## Angular Full Stack (Docker)
+
+```bash
+docker compose -f infra/docker-compose.angular.full.yml up -d --build
+```
+
+Angular Web + API via Nginx: `http://localhost:8081`
+Health: `http://localhost:8081/api/health`
+
+## Angular Frontend (Docker)
+
+```bash
+docker compose -f infra/docker-compose.angular.web.yml up -d --build
+```
+
+Angular Web: `http://localhost:8081`
 
 ## Azure (Terraform + Container Apps)
 

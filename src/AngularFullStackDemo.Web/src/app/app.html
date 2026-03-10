@@ -1,0 +1,100 @@
+<div class="app">
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">AngularFullStackDemo</p>
+      <h1>Personal Knowledge Publisher</h1>
+      <p class="subtitle">
+        Draft, edit, and publish markdown knowledge cards with a clean API.
+      </p>
+    </div>
+    <button class="ghost" type="button" (click)="newDraft()">New Draft</button>
+  </header>
+
+  <div class="content">
+    <aside class="panel list-panel">
+      <div class="panel-header">
+        <h2>Recent Posts</h2>
+        <button class="small" type="button" (click)="loadPosts()" [disabled]="loading">
+          {{ loading ? 'Loading...' : 'Refresh' }}
+        </button>
+      </div>
+
+      <p class="empty" *ngIf="posts.length === 0 && !loading">
+        No posts yet. Create the first draft.
+      </p>
+
+      <ul class="post-list" *ngIf="posts.length > 0">
+        <li *ngFor="let post of posts" [class.active]="post.id === selectedId" (click)="selectPost(post.id)">
+          <div>
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.slug }}</p>
+          </div>
+          <span class="status" [class.live]="post.status === 1" [class.draft]="post.status === 0">
+            {{ statusLabel(post.status) }}
+          </span>
+        </li>
+      </ul>
+    </aside>
+
+    <section class="panel editor-panel">
+      <div class="panel-header">
+        <h2>{{ selectedId ? 'Edit Post' : 'Create Post' }}</h2>
+        <div class="meta">
+          <span *ngIf="selectedPost?.updatedAt">
+            Updated {{ selectedPost?.updatedAt | date: 'medium' }}
+          </span>
+          <span class="divider"></span>
+          <span>{{ selectedId ? 'Editing' : 'Drafting' }}</span>
+        </div>
+      </div>
+
+      <div class="error" *ngIf="error">{{ error }}</div>
+
+      <div class="form-grid">
+        <label>
+          Title
+          <input type="text" [(ngModel)]="title" placeholder="Explain the idea in one line" />
+        </label>
+
+        <label>
+          Status
+          <select [(ngModel)]="status">
+            <option [ngValue]="0">Draft</option>
+            <option [ngValue]="1">Published</option>
+          </select>
+        </label>
+
+        <label class="span-2">
+          Tags (comma separated)
+          <input type="text" [(ngModel)]="tagsInput" placeholder="architecture, patterns, database" />
+        </label>
+
+        <label class="span-2">
+          Markdown Content
+          <textarea [(ngModel)]="markdown" placeholder="Write the content in Markdown..."></textarea>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="button" (click)="save()" [disabled]="saving">
+          {{ saving ? 'Saving...' : 'Save Post' }}
+        </button>
+        <div class="helper">
+          <span>Status: {{ statusLabel(status) }}</span>
+          <span>API: /api</span>
+        </div>
+      </div>
+
+      <div class="preview">
+        <h3>Markdown Preview</h3>
+        <div class="preview-card">
+          <h4>{{ title || 'Untitled draft' }}</h4>
+          <p class="preview-meta">
+            {{ tags.length > 0 ? tags.join(' · ') : 'No tags yet' }}
+          </p>
+          <pre>{{ markdown || 'Write something to see the preview.' }}</pre>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
