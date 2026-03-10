@@ -1,6 +1,8 @@
 name: deploy-azure-dispatch
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 env:
