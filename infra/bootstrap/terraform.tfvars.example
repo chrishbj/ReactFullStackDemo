@@ -1,0 +1,4 @@
+# resource_group_name = "reactfullstackdemo-tfstate-rg"
+# location = "eastus"
+# storage_account_name = "rfsdtfstate123"
+# container_name = "tfstate"

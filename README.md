@@ -62,14 +62,21 @@ This deploys a single Container App with three containers: `web`, `api`, and a M
 az login
 ```
 
-2. Provision infrastructure
+2. Bootstrap Terraform state storage (one-time)
+```bash
+cd infra/bootstrap
+terraform init
+terraform apply
+```
+
+3. Provision infrastructure
 ```bash
 cd infra/terraform
 terraform init
 terraform apply
 ```
 
-3. Build and push images
+4. Build and push images
 ```bash
 az acr login -n <acr-name-from-output>
 docker build -t <acr-login-server>/react-fullstack-demo-api:v1 -f src/ReactFullStackDemo.Api/Dockerfile .
@@ -78,13 +85,13 @@ docker build -t <acr-login-server>/react-fullstack-demo-web:v1 -f src/ReactFullS
 docker push <acr-login-server>/react-fullstack-demo-web:v1
 ```
 
-4. Deploy the images
+5. Deploy the images
 ```bash
 cd infra/terraform
 terraform apply -var="api_image_tag=v1" -var="web_image_tag=v1"
 ```
 
-5. Get the URL
+6. Get the URL
 ```bash
 terraform output container_app_url
 ```
