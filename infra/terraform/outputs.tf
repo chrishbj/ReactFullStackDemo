@@ -3,11 +3,11 @@ output "resource_group_name" {
 }
 
 output "container_app_url" {
-  value = "https://${azurerm_container_app.app.latest_revision_fqdn}"
+  value = "https://${azurerm_container_app.app.ingress[0].fqdn}"
 }
 
 output "angular_app_url" {
-  value = "https://${azurerm_container_app.angular.latest_revision_fqdn}"
+  value = "https://${azurerm_container_app.angular.ingress[0].fqdn}"
 }
 
 output "acr_login_server" {
