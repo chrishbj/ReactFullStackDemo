@@ -95,3 +95,10 @@ terraform apply -var="api_image_tag=v1" -var="web_image_tag=v1"
 ```bash
 terraform output container_app_url
 ```
+
+## Architecture Diagrams
+
+- English: `docs/architecture-en.md`
+- 中文（本地版本，不提交）：`docs/architecture-zh.md`
+
+![System Architecture](docs/architecture-en.png)
