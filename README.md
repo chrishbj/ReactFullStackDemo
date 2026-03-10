@@ -42,4 +42,13 @@ docker compose -f infra/docker-compose.web.yml up -d --build
 
 Web: `http://localhost:8080`
 
-Note: `/api` is proxied to the `api` container. Integration will be added in the next step.
+Note: `/api` is proxied to the `api` container. For a full stack run, use the compose file below.
+
+## Full Stack (Docker)
+
+```bash
+docker compose -f infra/docker-compose.full.yml up -d --build
+```
+
+Web + API via Nginx: `http://localhost:8080`
+Health: `http://localhost:8080/api/health`
