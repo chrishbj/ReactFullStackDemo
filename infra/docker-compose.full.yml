@@ -25,6 +25,8 @@ services:
       dockerfile: src/ReactFullStackDemo.Web/Dockerfile
     ports:
       - "8080:80"
+    environment:
+      API_UPSTREAM: api:8080
     depends_on:
       - api
 

@@ -1,7 +1,7 @@
 variable "name_prefix" {
   type        = string
   description = "Prefix used for Azure resources."
-  default     = "sharegate-demo"
+  default     = "react-fullstack-demo"
 }
 
 variable "location" {
@@ -13,7 +13,7 @@ variable "location" {
 variable "api_image_name" {
   type        = string
   description = "Container image name for the API."
-  default     = "sharegate-demo-api"
+  default     = "react-fullstack-demo-api"
 }
 
 variable "api_image_tag" {
@@ -22,8 +22,20 @@ variable "api_image_tag" {
   default     = "v1"
 }
 
+variable "web_image_name" {
+  type        = string
+  description = "Container image name for the web app."
+  default     = "react-fullstack-demo-web"
+}
+
+variable "web_image_tag" {
+  type        = string
+  description = "Container image tag for the web app."
+  default     = "v1"
+}
+
 variable "mongo_database" {
   type        = string
   description = "MongoDB database name."
-  default     = "sharegate_demo"
+  default     = "react_fullstack_demo"
 }

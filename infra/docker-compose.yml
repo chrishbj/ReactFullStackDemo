@@ -2,7 +2,7 @@ version: "3.9"
 services:
   mongo:
     image: mongo:7
-    container_name: sharegate-demo-mongo
+    container_name: react-fullstack-demo-mongo
     ports:
       - "27018:27017"
     volumes:

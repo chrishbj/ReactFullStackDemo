@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -17,10 +17,23 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore ShareGateDemo.sln
+        run: dotnet restore ReactFullStackDemo.slnx
 
-      - name: Build
-        run: dotnet build ShareGateDemo.sln -c Release --no-restore
+      - name: Test (API)
+        run: dotnet test ReactFullStackDemo.slnx -c Release --no-restore
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Web Dependencies
+        working-directory: src/ReactFullStackDemo.Web
+        run: npm ci
+
+      - name: Test (Web)
+        working-directory: src/ReactFullStackDemo.Web
+        run: npm test

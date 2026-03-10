@@ -60,14 +60,14 @@ resource "azurerm_container_registry" "acr" {
 }
 
 resource "azurerm_container_app" "app" {
-  name                         = "${var.name_prefix}-api"
+  name                         = "${var.name_prefix}-app"
   resource_group_name          = azurerm_resource_group.rg.name
   container_app_environment_id = azurerm_container_app_environment.env.id
   revision_mode                = "Single"
 
   ingress {
     external_enabled = true
-    target_port      = 8080
+    target_port      = 80
 
     traffic_weight {
       latest_revision = true
@@ -94,6 +94,18 @@ resource "azurerm_container_app" "app" {
   template {
     min_replicas = 1
     max_replicas = 1
+
+    container {
+      name   = "web"
+      image  = "${azurerm_container_registry.acr.login_server}/${var.web_image_name}:${var.web_image_tag}"
+      cpu    = 0.25
+      memory = "0.5Gi"
+
+      env {
+        name  = "API_UPSTREAM"
+        value = "localhost:8080"
+      }
+    }
 
     container {
       name   = "api"
