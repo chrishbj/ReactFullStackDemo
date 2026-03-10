@@ -192,7 +192,7 @@ resource "azurerm_container_app" "angular" {
 
       env {
         name  = "API_UPSTREAM"
-        value = "${azurerm_container_app.app.ingress[0].fqdn}:8080"
+        value = "https://${azurerm_container_app.app.ingress[0].fqdn}"
       }
     }
   }

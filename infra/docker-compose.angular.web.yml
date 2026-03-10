@@ -6,4 +6,4 @@ services:
     ports:
       - "8081:80"
     environment:
-      API_UPSTREAM: api:8080
+      API_UPSTREAM: http://api:8080
