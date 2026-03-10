@@ -1,0 +1,7 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: src/ReactFullStackDemo.Web/Dockerfile
+    ports:
+      - "8080:80"

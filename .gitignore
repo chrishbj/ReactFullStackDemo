@@ -1,6 +1,7 @@
 ## Build results
 bin/
 obj/
+dist/
 
 ## User-specific files
 *.user
@@ -22,6 +23,7 @@ Thumbs.db
 ## Local tooling
 .env
 appsettings.Development.json
+src/ReactFullStackDemo.Web/node_modules/
 
 ## Terraform / infra artifacts
 infra/terraform/.terraform/
