@@ -37,3 +37,11 @@ jobs:
       - name: Test (Web)
         working-directory: src/ReactFullStackDemo.Web
         run: npm test
+
+      - name: Install Angular Web Dependencies
+        working-directory: src/AngularFullStackDemo.Web
+        run: npm ci
+
+      - name: Test (Angular Web)
+        working-directory: src/AngularFullStackDemo.Web
+        run: npm test -- --watch=false --browsers=ChromeHeadless
