@@ -133,6 +133,11 @@ terraform output container_app_url
 terraform output angular_app_url
 ```
 
+## CI/CD Triggers
+
+- `ci.yml`: runs on push to `main`.
+- `deploy-azure-dispatch.yml`: runs automatically after `ci` succeeds on `main`, and can also be run manually via `workflow_dispatch`.
+
 ## Architecture Diagrams
 
 - English: `docs/architecture-en.md`

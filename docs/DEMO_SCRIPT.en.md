@@ -28,6 +28,10 @@ docker compose -f infra/docker-compose.full.yml up -d --build
 docker compose -f infra/docker-compose.angular.full.yml up -d --build
 ```
 - Angular: `http://localhost:8081`
+> If you want Angular to reuse the React backend, use:
+```bash
+docker compose -p angular -f infra/docker-compose.angular.web.local.yml up -d --build
+```
 
 5. **Live Site**
 - React App: `https://react-fullstack-demo-app.orangepond-3f12b8c2.canadacentral.azurecontainerapps.io`
@@ -49,6 +53,7 @@ curl https://react-fullstack-demo-app.orangepond-3f12b8c2.canadacentral.azurecon
 - Workflows: `ci`, `deploy-azure-dispatch`
 - Build and push web + api + angular images
 - Terraform applies infrastructure and deployment
+ - Deploy workflow runs automatically after `ci` succeeds on `main`
 
 9. **IaC**
 - `infra/terraform`: ACA + ACR + Log Analytics (two Container Apps)

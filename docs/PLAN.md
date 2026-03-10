@@ -61,7 +61,8 @@
 
 ## 8. CI/CD Plan (Target)
 - `ci.yml`: Build .NET + Node, run unit tests and fast integration tests.
-- `deploy-azure.yml`: Build and push web + api + angular images, then Terraform apply.
+- `deploy-azure-dispatch.yml`: Build and push web + api + angular images, then Terraform apply.
+- Deploy runs automatically after `ci` succeeds on `main`, plus manual dispatch.
 - Support manual dispatch for demo updates.
 
 ## 9. Milestones (Suggested Order)
