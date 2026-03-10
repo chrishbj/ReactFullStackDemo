@@ -44,7 +44,7 @@ npm start
 
 Angular dev server: `http://localhost:4200`
 
-## Frontend (Docker)
+## React Frontend (Docker)
 
 ```bash
 docker compose -f infra/docker-compose.web.yml up -d --build
@@ -54,7 +54,7 @@ Web: `http://localhost:8080`
 
 Note: `/api` is proxied to the `api` container. For a full stack run, use the compose file below.
 
-## Full Stack (Docker)
+## React Full Stack (Docker)
 
 ```bash
 docker compose -f infra/docker-compose.full.yml up -d --build
