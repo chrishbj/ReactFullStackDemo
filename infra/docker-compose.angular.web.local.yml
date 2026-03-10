@@ -1,0 +1,10 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: src/AngularFullStackDemo.Web/Dockerfile
+    ports:
+      - "8081:80"
+    environment:
+      API_UPSTREAM_SCHEME: http
+      API_UPSTREAM_HOST: host.docker.internal:5069

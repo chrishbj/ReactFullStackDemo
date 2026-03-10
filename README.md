@@ -80,6 +80,15 @@ docker compose -f infra/docker-compose.angular.web.yml up -d --build
 
 Angular Web: `http://localhost:8081`
 
+## Angular Frontend (Docker, reuse React backend)
+
+```bash
+docker compose -p angular -f infra/docker-compose.angular.web.local.yml up -d --build
+```
+
+Angular Web: `http://localhost:8081`
+Backend: `http://localhost:5069` (from `infra/docker-compose.full.yml`)
+
 ## Azure (Terraform + Container Apps)
 
 This deploys a single Container App with three containers: `web`, `api`, and a MongoDB sidecar.

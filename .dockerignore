@@ -1,0 +1,14 @@
+.git
+.github
+**/.DS_Store
+**/node_modules
+**/dist
+**/bin
+**/obj
+**/.angular
+**/.vite
+**/.cache
+**/.terraform
+infra/bootstrap/terraform.tfstate
+infra/bootstrap/terraform.tfstate.backup
+infra/bootstrap/.terraform.lock.hcl
