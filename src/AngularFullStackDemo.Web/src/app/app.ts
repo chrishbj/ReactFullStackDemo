@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { finalize, take } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,6 @@ import { firstValueFrom } from 'rxjs';
 })
 export class App implements OnInit {
   private readonly http = inject(HttpClient);
-  private readonly cdr = inject(ChangeDetectorRef);
   private readonly apiBase = '/api';
 
   posts: PostSummary[] = [];
@@ -47,35 +46,43 @@ export class App implements OnInit {
   async loadPosts(): Promise<void> {
     this.loading = true;
     this.error = null;
-    try {
-      const data = await firstValueFrom(
-        this.http.get<PostSummary[]>(`${this.apiBase}/posts`)
-      );
-      this.posts = data;
-    } catch (err) {
-      this.error = err instanceof Error ? err.message : 'Failed to load posts';
-    } finally {
-      this.loading = false;
-      this.cdr.detectChanges();
-    }
+    this.http
+      .get<PostSummary[]>(`${this.apiBase}/posts`)
+      .pipe(
+        take(1),
+        finalize(() => {
+          this.loading = false;
+        })
+      )
+      .subscribe({
+        next: (data) => {
+          this.posts = data;
+        },
+        error: (err) => {
+          this.error =
+            err instanceof Error ? err.message : 'Failed to load posts';
+        }
+      });
   }
 
   async selectPost(id: string): Promise<void> {
     this.selectedId = id;
     this.error = null;
-    try {
-      const post = await firstValueFrom(
-        this.http.get<PostDetail>(`${this.apiBase}/posts/${id}`)
-      );
-      this.title = post.title;
-      this.markdown = post.markdown;
-      this.status = post.status;
-      this.tagsInput = post.tags.join(', ');
-    } catch (err) {
-      this.error = err instanceof Error ? err.message : 'Failed to load post';
-    } finally {
-      this.cdr.detectChanges();
-    }
+    this.http
+      .get<PostDetail>(`${this.apiBase}/posts/${id}`)
+      .pipe(take(1))
+      .subscribe({
+        next: (post) => {
+          this.title = post.title;
+          this.markdown = post.markdown;
+          this.status = post.status;
+          this.tagsInput = post.tags.join(', ');
+        },
+        error: (err) => {
+          this.error =
+            err instanceof Error ? err.message : 'Failed to load post';
+        }
+      });
   }
 
   newDraft(): void {
@@ -103,31 +110,54 @@ export class App implements OnInit {
           status: this.status,
           tags: this.tags
         };
-        const created = await firstValueFrom(
-          this.http.post<PostDetail>(`${this.apiBase}/posts`, payload)
-        );
-        this.selectedId = created.id;
-      } else {
-        const payload: UpdatePostRequest = {
-          title: this.title,
-          markdown: this.markdown,
-          status: this.status,
-          tags: this.tags
-        };
-        await firstValueFrom(
-          this.http.put<PostDetail>(
-            `${this.apiBase}/posts/${this.selectedId}`,
-            payload
+        this.http
+          .post<PostDetail>(`${this.apiBase}/posts`, payload)
+          .pipe(
+            take(1),
+            finalize(() => {
+              this.saving = false;
+            })
           )
-        );
+          .subscribe({
+            next: (created) => {
+              this.selectedId = created.id;
+              this.loadPosts();
+            },
+            error: (err) => {
+              this.error =
+                err instanceof Error ? err.message : 'Save failed';
+            }
+          });
+        return;
       }
 
-      await this.loadPosts();
+      const payload: UpdatePostRequest = {
+        title: this.title,
+        markdown: this.markdown,
+        status: this.status,
+        tags: this.tags
+      };
+      this.http
+        .put<PostDetail>(`${this.apiBase}/posts/${this.selectedId}`, payload)
+        .pipe(
+          take(1),
+          finalize(() => {
+            this.saving = false;
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.loadPosts();
+          },
+          error: (err) => {
+            this.error = err instanceof Error ? err.message : 'Save failed';
+          }
+        });
+      return;
     } catch (err) {
       this.error = err instanceof Error ? err.message : 'Save failed';
     } finally {
       this.saving = false;
-      this.cdr.detectChanges();
     }
   }
 }
