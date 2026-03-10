@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ReactFullStackDemo.Api.Tests/ReactFullStackDemo.Api.Tests.csproj" />
+    <Project Path="src/ReactFullStackDemo.Api/ReactFullStackDemo.Api.csproj" />
+  </Folder>
+</Solution>

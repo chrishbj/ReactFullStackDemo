@@ -1,0 +1,23 @@
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  api:
+    build:
+      context: ..
+      dockerfile: src/ReactFullStackDemo.Api/Dockerfile
+    ports:
+      - "5069:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      Mongo__ConnectionString: mongodb://mongo:27017
+      Mongo__Database: react_fullstack_demo
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:

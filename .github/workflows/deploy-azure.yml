@@ -1,0 +1,106 @@
+name: deploy-azure
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  TF_WORKING_DIR: infra/terraform
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init -backend-config="resource_group_name=${{ secrets.TF_STATE_RG }}" -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE }}" -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER }}" -backend-config="key=${{ secrets.TF_STATE_KEY }}"
+
+      - name: Terraform Import Existing (if needed)
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          set -e
+          STATE_LIST=$(terraform state list || true)
+          RG_ID="/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/sharegate-demo-rg"
+          if ! echo "$STATE_LIST" | grep -q '^azurerm_resource_group\.rg$'; then
+            terraform import azurerm_resource_group.rg "$RG_ID" || true
+          fi
+
+          LAW_ID="/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/sharegate-demo-rg/providers/Microsoft.OperationalInsights/workspaces/sharegate-demo-law"
+          if ! echo "$STATE_LIST" | grep -q '^azurerm_log_analytics_workspace\.law$'; then
+            terraform import azurerm_log_analytics_workspace.law "$LAW_ID" || true
+          fi
+
+          ENV_ID="/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/sharegate-demo-rg/providers/Microsoft.App/managedEnvironments/sharegate-demo-env"
+          if ! echo "$STATE_LIST" | grep -q '^azurerm_container_app_environment\.env$'; then
+            terraform import azurerm_container_app_environment.env "$ENV_ID" || true
+          fi
+
+          APP_ID="/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/sharegate-demo-rg/providers/Microsoft.App/containerApps/sharegate-demo-api"
+          if ! echo "$STATE_LIST" | grep -q '^azurerm_container_app\.app$'; then
+            terraform import azurerm_container_app.app "$APP_ID" || true
+          fi
+
+          ACR_NAME=$(az acr list -g sharegate-demo-rg --query '[0].name' -o tsv)
+          if [ -n "$ACR_NAME" ]; then
+            ACR_ID="/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/sharegate-demo-rg/providers/Microsoft.ContainerRegistry/registries/$ACR_NAME"
+            if ! echo "$STATE_LIST" | grep -q '^azurerm_container_registry\.acr$'; then
+              terraform import azurerm_container_registry.acr "$ACR_ID" || true
+            fi
+
+            SUFFIX=${ACR_NAME#sharegatedemo}
+            if [ -n "$SUFFIX" ] && ! echo "$STATE_LIST" | grep -q '^random_string\.suffix$'; then
+              terraform import random_string.suffix "$SUFFIX" || true
+            fi
+          fi
+
+      - name: Terraform Apply (Base Infra)
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform apply -auto-approve \
+            -target="random_string.suffix" \
+            -target="azurerm_resource_group.rg" \
+            -target="azurerm_log_analytics_workspace.law" \
+            -target="azurerm_container_registry.acr" \
+            -target="azurerm_container_app_environment.env"
+
+      - name: Read ACR Info
+        id: acr
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "login_server=$(terraform output -raw acr_login_server)" >> $GITHUB_OUTPUT
+          echo "name=$(terraform output -raw acr_name)" >> $GITHUB_OUTPUT
+
+      - name: ACR Login
+        run: az acr login -n ${{ steps.acr.outputs.name }}
+
+      - name: Build and Push Image
+        env:
+          ACR_LOGIN_SERVER: ${{ steps.acr.outputs.login_server }}
+        run: |
+          docker build -t $ACR_LOGIN_SERVER/sharegate-demo-api:$IMAGE_TAG -f src/ShareGateDemo.Api/Dockerfile .
+          docker push $ACR_LOGIN_SERVER/sharegate-demo-api:$IMAGE_TAG
+
+      - name: Terraform Apply (Full)
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -auto-approve -var="api_image_tag=$IMAGE_TAG"

@@ -1,0 +1,6 @@
+@ReactFullStackDemo.Api_HostAddress = http://localhost:5067
+
+GET {{ReactFullStackDemo.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
