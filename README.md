@@ -140,7 +140,6 @@ terraform output angular_app_url
 
 ## Architecture Diagrams
 
-- English: `docs/architecture-en.md`
-- 中文（本地版本，不提交）：`docs/architecture-zh.md`
+- English: `docs/architecture-en.md` 
 
 ![System Architecture](docs/architecture-en.png)
